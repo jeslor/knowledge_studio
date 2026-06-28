@@ -2,4 +2,4 @@ from django.apps import AppConfig
 
 
 class KbConfig(AppConfig):
-    name = 'kb'
+    name = 'apps.kb'
