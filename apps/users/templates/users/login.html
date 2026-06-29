@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-md mx-auto my-12 bg-white border border-gray-200 rounded-2xl shadow-sm p-8">
+
+    <div class="text-center mb-8">
+        <h2 class="text-3xl font-bold tracking-tight text-gray-900">Welcome Back</h2>
+        <p class="text-sm text-gray-500 mt-2">Please enter your credentials to log in</p>
+    </div>
+
+    <form method="POST" class="space-y-6">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm space-y-1">
+                {% for error in form.non_field_errors %}
+                    <p class="font-medium">{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% for field in form %}
+            <div class="space-y-1.5">
+                <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                    {{ field.label }}
+                </label>
+
+                <div class="relative">
+                    {{ field }}
+                </div>
+
+                {% if field.errors %}
+                    <p class="text-xs font-medium text-red-600 mt-1">
+                        {{ field.errors|striptags }}
+                    </p>
+                {% endif %}
+
+                {% if field.help_text %}
+                    <p class="text-xs text-gray-400 mt-1">{{ field.help_text|safe }}</p>
+                {% endif %}
+            </div>
+        {% endfor %}
+
+        <button type="submit" class="w-full inline-flex items-center justify-center px-5 py-3 border border-transparent text-sm font-medium rounded-xl text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition shadow-sm font-semibold">
+            Sign In
+        </button>
+    </form>
+
+    <div class="text-center mt-6 pt-6 border-t border-gray-100 text-sm text-gray-500">
+        Don't have an account?
+        <a href="/register/" class="font-semibold text-indigo-600 hover:text-indigo-500 transition ml-1">Register here</a>
+    </div>
+
+</div>
+{% endblock content %}

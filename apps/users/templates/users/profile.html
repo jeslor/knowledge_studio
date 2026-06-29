@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto bg-white border border-gray-200 rounded-2xl shadow-sm p-8 space-y-6">
+
+    <div class="flex items-start justify-between">
+        <div>
+            <h2 class="text-3xl font-bold tracking-tight text-gray-900">
+                {{target_user.first_name }} {{ target_user.last_name }}
+            </h2>
+            <p class="text-sm text-gray-500 mt-1">{{ target_user.email }}</p>
+        </div>
+
+        {% if target_user.is_manager %}
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                Manager Account
+            </span>
+        {% endif %}
+    </div>
+
+    <hr class="border-gray-100">
+
+    <div class="space-y-2">
+        <h3 class="text-lg font-semibold text-gray-900">Bio</h3>
+
+        <div class="prose max-w-none text-gray-600 leading-relaxed bg-gray-50 p-4 rounded-xl border border-gray-100">
+            {{ profile.profile_bio|safe|default:"This user hasn't written a bio yet." }}
+        </div>
+    </div>
+
+    {% if profile.profile_photo_url %}
+        <div class="space-y-2">
+            <h3 class="text-lg font-semibold text-gray-900">Profile Photo</h3>
+            <img src="{{ profile.profile_photo_url }}" alt="Profile Photo" class="w-36 h-36 object-cover rounded-xl shadow-inner border border-gray-200">
+        </div>
+    {% endif %}
+
+    {% if is_own_profile %}
+        <div class="pt-4">
+            <a href="{%url 'edit_profile' target_user.pk %}" class="inline-flex items-center justify-center px-5 py-2.5 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition shadow-sm">
+                Edit My Profile
+            </a>
+        </div>
+    {% endif %}
+    
+</div>
+{% endblock content %}
