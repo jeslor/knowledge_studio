@@ -103,7 +103,7 @@
             }
         });
 
-        async def_fetch(stepData) {
+        async function fetch(stepData) {
             const response = await fetch('/api/rag/', {
                 method: 'POST',
                 headers: {
@@ -116,6 +116,7 @@
         }
 
         async function executePipeline() {
+            alert("clicked")
             const query = queryInput.value.trim();
             if (!query) return;
             queryInput.value = '';
