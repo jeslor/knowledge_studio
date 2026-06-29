@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-xl mx-auto my-8 bg-white border border-gray-200 rounded-2xl shadow-sm p-8">
+    
+    <div class="text-center mb-8">
+        <h2 class="text-3xl font-bold tracking-tight text-gray-900">Create your account</h2>
+        <p class="text-sm text-gray-500 mt-2">Join us by filling out your information below</p>
+    </div>
+
+    <form method="POST" class="space-y-5">
+        {% csrf_token %}
+        
+        {% if form.non_field_errors %}
+            <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm space-y-1">
+                {% for error in form.non_field_errors %}
+                    <p class="font-medium">{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="space-y-1.5">
+                <label for="{{ form.first_name.id_for_label }}" class="block text-sm font-medium text-gray-700">First Name</label>
+                {{ form.first_name }}
+                {% if form.first_name.errors %}<p class="text-xs font-medium text-red-600 mt-1">{{ form.first_name.errors|striptags }}</p>{% endif %}
+            </div>
+            <div class="space-y-1.5">
+                <label for="{{ form.last_name.id_for_label }}" class="block text-sm font-medium text-gray-700">Last Name</label>
+                {{ form.last_name }}
+                {% if form.last_name.errors %}<p class="text-xs font-medium text-red-600 mt-1">{{ form.last_name.errors|striptags }}</p>{% endif %}
+            </div>
+        </div>
+
+        <div class="space-y-1.5">
+            <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-gray-700">Email Address</label>
+            {{ form.email }}
+            {% if form.email.errors %}<p class="text-xs font-medium text-red-600 mt-1">{{ form.email.errors|striptags }}</p>{% endif %}
+        </div>
+
+        <div class="space-y-1.5">
+            <label for="{{ form.username.id_for_label }}" class="block text-sm font-medium text-gray-700">Username</label>
+            {{ form.username }}
+            {% if form.username.errors %}<p class="text-xs font-medium text-red-600 mt-1">{{ form.username.errors|striptags }}</p>{% endif %}
+        </div>
+
+        <div class="space-y-1.5">
+            <label for="{{ form.password1.id_for_label }}" class="block text-sm font-medium text-gray-700">Password</label>
+            {{ form.password1 }}
+            {% if form.password1.errors %}<p class="text-xs font-medium text-red-600 mt-1">{{ form.password1.errors|striptags }}</p>{% endif %}
+            {% if form.password1.help_text %}
+                <p class="text-[11px] text-gray-400 mt-1 leading-normal">{{ form.password1.help_text|safe }}</p>
+            {% endif %}
+        </div>
+
+        <div class="space-y-1.5">
+            <label for="{{ form.password2.id_for_label }}" class="block text-sm font-medium text-gray-700">Confirm Password</label>
+            {{ form.password2 }}
+            {% if form.password2.errors %}<p class="text-xs font-medium text-red-600 mt-1">{{ form.password2.errors|striptags }}</p>{% endif %}
+        </div>
+
+        <button type="submit" class="w-full mt-2 inline-flex items-center justify-center px-5 py-3 border border-transparent text-sm font-medium rounded-xl text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition shadow-sm font-semibold">
+            Create Account
+        </button>
+    </form>
+
+    <div class="text-center mt-6 pt-6 border-t border-gray-100 text-sm text-gray-500">
+        Already have an account? 
+        <a href="/login/" class="font-semibold text-indigo-600 hover:text-indigo-500 transition ml-1">Sign in instead</a>
+    </div>
+
+</div>
+{% endblock content %}

@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/44.0.0/ckeditor5.css">
+<script src="https://cdn.ckeditor.com/ckeditor5/44.0.0/ckeditor5.umd.js"></script>
+
+<div class="max-w-xl mx-auto my-8 bg-white border border-gray-200 rounded-2xl shadow-sm p-8">
+
+    <div class="mb-8">
+        <h2 class="text-3xl font-bold tracking-tight text-gray-900">Edit Profile</h2>
+        <p class="text-sm text-gray-500 mt-2">Update your information below.</p>
+    </div>
+
+    <form method="POST" class="space-y-5">
+        {% csrf_token %}
+
+        <h3 class="text-lg font-semibold text-gray-800 border-b border-gray-100 pb-2">Account Details</h3>
+
+        <div class="space-y-1.5">
+            <label class="block text-sm font-medium text-gray-700">Email Address </label>
+            {{ user_form.email }}
+        </div>
+
+        <div class="space-y-1.5">
+            <label class="block text-sm font-medium text-gray-700">Username</label>
+            <input type="text"
+                   name="username"
+                   value="{{ target_user.username }}"
+                   class="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+            <div class="space-y-1.5">
+                <label class="block text-sm font-medium text-gray-700">First name </label>
+                {{ user_form.first_name }}
+            </div>
+
+            <div class="space-y-1.5">
+                <label class="block text-sm font-medium text-gray-700">Last name </label>
+                {{ user_form.last_name }}
+            </div>
+        </div>
+
+        <h3 class="text-lg font-semibold text-gray-800 border-b border-gray-100 pt-4 pb-2">Public Profile</h3>
+
+        <div class="space-y-1.5">
+            <label class="block text-sm font-medium text-gray-700">Biography</label>
+            <div class="prose max-w-none">
+                {{ profile_form.profile_bio }}
+            </div>
+        </div>
+
+        <div class="flex items-center justify-end space-x-3 pt-6 border-t border-gray-100">
+            <a href="/profile/{{ target_user.id }}/" class="px-5 py-2.5 border border-gray-300 text-sm font-medium rounded-xl text-gray-700 bg-white hover:bg-gray-50 transition">
+                Cancel
+            </a>
+            <button type="submit" class="px-5 py-2.5 text-sm font-medium rounded-xl text-white bg-indigo-600 hover:bg-indigo-700 transition shadow-sm font-semibold">
+                Save Changes
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+    const { ClassicEditor, Essentials, Bold, Italic, Paragraph, List } = CKEditor5;
+
+    ClassicEditor
+        .create(document.querySelector('#id_profile_bio'), {
+            plugins: [ Essentials, Bold, Italic, Paragraph, List ],
+            toolbar: [ 'undo', 'redo', '|', 'bold', 'italic', '|', 'bulletedList', 'numberedList' ]
+        })
+        .catch(error => {
+            console.error(error);
+        });
+</script>
+
+<style>
+    .ck-editor__editable_inline {
+        min-height: 200px;
+        border-radius: 0 0 12px 12px !important;
+        border-color: #e5e7eb !important;
+    }
+    .ck-toolbar {
+        border-radius: 12px 12px 0 0 !important;
+        border-color: #e5e7eb !important;
+        background-color: #f9fafb !important;
+    }
+</style>
+{% endblock content %}
