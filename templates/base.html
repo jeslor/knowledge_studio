@@ -59,10 +59,10 @@
                     <!-- Clean SVG User Icon -->
                    <iconify-icon class="text-[28px]" icon="ei:user"></iconify-icon>
                     <span>
-                        {% if user.first_name %}
-                            {{ user.first_name }}
-                        {% else %}
+                        {% if user.username %}
                             {{ user.username }}
+                        {% else %}
+                            {{ user.first_name }}
                         {% endif %}
                     </span>
                 </a>
@@ -116,7 +116,7 @@
         }
 
         async function executePipeline() {
-            alert("clicked")
+            if(queryInput && queryInput.value.trim() === '') return
             const query = queryInput.value.trim();
             if (!query) return;
             queryInput.value = '';

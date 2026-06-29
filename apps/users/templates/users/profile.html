@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class=" mx-auto bg-white border border-gray-200 rounded-2xl shadow-sm p-8 space-y-6">
+<div class=" mx-auto bg-white border border-gray-200 rounded-2xl shadow-sm p-8 space-y-6 w-full">
 
     <div class="flex items-start justify-between">
         <div>
@@ -23,9 +23,9 @@
     <div class="space-y-2">
         <h3 class="text-lg font-semibold text-gray-900">Bio</h3>
 
-        <div class="prose max-w-none text-gray-600 leading-relaxed bg-gray-50 p-4 rounded-xl border border-gray-100">
+        <pre style="font-family: inherit;" class="prose max-w-none text-gray-600 leading-relaxed bg-gray-50 p-4 rounded-xl border border-gray-100 whitespace-pre-wrap">
             {{ profile.profile_bio|safe|default:"This user hasn't written a bio yet." }}
-        </div>
+        </pre>
     </div>
 
     {% if profile.profile_photo_url %}
