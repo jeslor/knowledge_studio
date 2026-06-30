@@ -66,6 +66,9 @@
                         {% endif %}
                     </span>
                 </a>
+                  {% if user.is_manager %}
+                    <a href="{% url 'kb_admin_dashboard' %}" class="flex items-center space-x-2  transition hover:text-gray-100"><iconify-icon class="text-[28px]" icon="ei:archive"></iconify-icon> <span>Dashboard</span></a>
+                  {% endif %}
 
                 <!-- Make sure your logout URL pattern name matches this -->
                 <a href="{% url 'logout' %}" class="hover:text-red-600 transition font-semibold flex items-center flex items-center space-x-2 "><iconify-icon class="text-[28px]" icon="ei:lock"></iconify-icon> <span>Logout</span></a>
