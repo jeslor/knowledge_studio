@@ -29,11 +29,31 @@ fileUpload.addEventListener('change', (e) => {
     if (e.target.files.length > 0) {
         // Append newly selected files natively into our tracking matrix
         const incomingFiles = Array.from(e.target.files);
+
+        // Check if adding these files crosses the threshold of 10
+        if (selectedFiles.length + incomingFiles.length > 10) {
+            // Open the status panel to show the error seamlessly
+            statusPanel.classList.remove('hidden');
+            statusSpinner.classList.add('hidden'); // Hide loading spinner
+
+            // Match the red failure state styling exactly
+            statusBox.className = "flex items-center gap-3 bg-red-950/30 border border-red-900/50 text-red-300 p-3 rounded-lg text-sm";
+            statusBox.innerHTML = `
+                <span class="material-icons text-sm text-red-400">error</span>
+                Selection Ignored: Maximum upload limit reached. You can only process up to 10 files at a time.
+            `;
+
+            fileUpload.value = ''; // Reset file input selection
+            return;
+        }
+
         selectedFiles = [...selectedFiles, ...incomingFiles];
 
         renderFileList();
         updateButtonState();
     }
+
+
 });
 
 // 📍 New Function: Loops through and builds custom UI elements for every file
@@ -49,6 +69,8 @@ function renderFileList() {
     // Change dropzone headline summary statement
     fileNameLabel.innerText = `${selectedFiles.length} file(s) ready for ingestion`;
     fileNameLabel.classList.add('text-emerald-400');
+
+    //    TODO CHECK THE TOTAL FILE SIZE AND ADD A LIMIT
 
     selectedFiles.forEach((file, index) => {
         const fileRow = document.createElement('div');

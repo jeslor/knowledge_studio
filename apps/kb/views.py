@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.http import JsonResponse
+from .services import EmbeddData
 import json
 
 # Your internal logic imports
@@ -52,4 +53,6 @@ async def embed_document_api(request):
     """API endpoint that JS calls to run the embed step-by-step"""
     if request.method == 'POST':
         uploaded_files = request.FILES.getlist('documents')
+        if len(uploaded_files) > 5:
+            return JsonResponse({'success': False, 'error': 'Maximum limit of 5 files exceeded.'}, status=400)
         print(uploaded_files)

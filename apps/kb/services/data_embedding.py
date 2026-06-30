@@ -3,7 +3,7 @@ from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_qdrant import QdrantVectorStore
 from qdrant_client import QdrantClient
 from langchain_chroma import Chroma
-from ingest_pdf import ingest_pdf_directory
+from .ingest_pdf import ingest_pdf_directory
 import config
 
 
