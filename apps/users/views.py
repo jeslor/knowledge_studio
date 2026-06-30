@@ -5,9 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.http import HttpResponseForbidden
 
-
 from .models import CustomUser, UserProfile
-
 
 def login(request):
     if request.user.is_authenticated:
@@ -69,6 +67,7 @@ def register(request):
 def redirect_to_own_profile(request):
     """Intercepts static requests and forwards users to their personal dynamic ID url"""
     return redirect('profile', pk=request.user.pk)
+
 @login_required
 def profile(request, pk):
     # 1. Fetch the user matching the ID in the URL
@@ -144,8 +143,6 @@ def edit_profile(request, pk):
 
 @login_required
 def logout(request):
-    # This completely flushes the user's browser session data
-    auth_logout(request)
-
-    # Send them back to the login page (or homepage '/') after logging out
+    request.session.clear()
     return redirect('login')
+

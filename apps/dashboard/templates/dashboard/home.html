@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="flex w-full h-screen overflow-hidden ">
+
+        <main class="flex-1 h-full flex flex-col relative items-center justify-between">
+            <div class="w-full flex justify-between items-center px-8 py-4 border-b border-slate-900/60 bg-slate-950/20 backdrop-blur">
+                <span class="font-medium text-slate-300">Pipeline Workspace</span>
+                <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 text-xs rounded-full font-semibold">Connected</span>
+            </div>
+
+            <div id="chat-container" class="w-full max-w-4xl flex-1 overflow-y-auto p-6 md:p-8 custom-scroll mb-32 pb-10 flex flex-col gap-4">
+                <div id="empty-state" class="w-full flex flex-col items-center justify-center py-20 text-center gap-3 text-slate-500">
+                    <span class="material-icons text-5xl text-slate-700">explore</span>
+                    <span class="text-lg font-medium text-slate-400">Ready for instructions</span>
+                    <span class="text-sm max-w-sm">Submit a query below to monitor the retrieval processing stream.</span>
+                </div>
+            </div>
+
+            <div class="absolute bottom-0 left-0 right-0 flex justify-center p-6 bg-gradient-to-t from-[#0b0f19] via-[#0b0f19]/95 to-transparent">
+                <div class="w-full max-w-4xl bg-slate-800/50 border border-slate-700/50 rounded-2xl p-2 shadow-2xl flex items-center gap-2">
+                    <textarea id="query-input" placeholder="Ask your knowledge base anything..." rows="1" class="flex-1 bg-transparent text-slate-200 px-4 py-2 text-base focus:outline-none resize-none autogrow"></textarea>
+                    <button id="send-btn" class="bg-emerald-600 hover:bg-emerald-500 transition-all active:scale-95 text-white rounded-full p-2 flex items-center justify-center shadow-lg h-[40px] w-[40px] flex items-center justify-center text-[25px]">
+                        <iconify-icon icon="mdi:arrow-up"></iconify-icon>
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+{% endblock content %}
