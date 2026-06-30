@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block title %}KB Admin - Data Ingestion{% endblock %}
-
+{% load static %}
 {% block content %}
 <div class="flex flex-col w-full h-full p-8 max-w-4xl mx-auto gap-6">
     <div class="flex flex-col gap-1 border-b border-slate-900 pb-4">
@@ -12,18 +12,21 @@
     </div>
 
     <div class="w-full bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl flex flex-col gap-4">
-        <label class="text-xs font-semibold uppercase tracking-wider text-slate-400">Select Document File</label>
+        <label class="text-xs font-semibold uppercase tracking-wider text-slate-400">Select Document Files</label>
 
         <div class="flex items-center justify-center w-full">
             <label for="file-upload" class="flex flex-col items-center justify-center w-full h-40 border-2 border-slate-800 border-dashed rounded-xl cursor-pointer bg-slate-950/40 hover:bg-slate-950/80 hover:border-slate-700 transition-colors group">
                 <div class="flex flex-col items-center justify-center pt-5 pb-6 text-center px-4">
                     <span class="material-icons text-3xl text-slate-500 group-hover:text-slate-400 mb-2">cloud_upload</span>
-                    <p class="mb-1 text-sm text-slate-300 font-medium" id="file-name-label">Click to upload file</p>
+                    <p class="mb-1 text-sm text-slate-300 font-medium" id="file-name-label">Click to upload files</p>
                     <p class="text-xs text-slate-500">PDF, TXT, or MD documents up to 25MB</p>
                 </div>
+
                 <input id="file-upload" type="file" class="hidden" accept=".pdf,.txt,.md" multiple />
             </label>
         </div>
+
+        <div id="file-list-container" class="flex flex-col gap-2 w-full mt-1"></div>
 
         <div class="flex justify-end gap-3 mt-2">
             <button id="clear-btn" class="px-4 py-2 text-sm font-medium border border-slate-800 hover:border-slate-700 hover:bg-slate-800 text-slate-400 hover:text-slate-200 rounded-xl transition-all">
@@ -46,82 +49,5 @@
     </div>
 </div>
 
-<script>
-    const fileUpload = document.getElementById('file-upload');
-    const fileNameLabel = document.getElementById('file-name-label');
-    const embedBtn = document.getElementById('embed-btn');
-    const clearBtn = document.getElementById('clear-btn');
-    const statusPanel = document.getElementById('status-panel');
-    const statusBox = document.getElementById('status-box');
-    const statusSpinner = document.getElementById('status-spinner');
-    const statusText = document.getElementById('status-text');
-
-    let selectedFile = null;
-
-    fileUpload.addEventListener('change', (e) => {
-        if (e.target.files.length > 0) {
-            console.log(e.target.files)
-            selectedFile = e.target.files[0];
-            fileNameLabel.innerText = selectedFile.name;
-            fileNameLabel.classList.add('text-emerald-400');
-
-            // Enable Embed button state changes
-            embedBtn.disabled = false;
-            embedBtn.className = "px-5 py-2 text-sm font-semibold bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl flex items-center gap-2 active:scale-95 transition-all shadow-lg shadow-emerald-950/20";
-        }
-    });
-
-    clearBtn.addEventListener('click', resetForm);
-
-    function resetForm() {
-        fileUpload.value = '';
-        selectedFile = null;
-        fileNameLabel.innerText = "Click to upload file";
-        fileNameLabel.classList.remove('text-emerald-400');
-        embedBtn.disabled = true;
-        embedBtn.className = "px-5 py-2 text-sm font-semibold bg-slate-800 text-slate-500 rounded-xl flex items-center gap-2 cursor-not-allowed transition-all";
-        statusPanel.classList.add('hidden');
-    }
-
-    embedBtn.addEventListener('click', async () => {
-        if (!selectedFile) return;
-
-        // Display logging panel
-        statusPanel.classList.remove('hidden');
-        statusSpinner.classList.remove('hidden');
-        statusBox.className = "flex items-center gap-3 bg-slate-850 p-3 rounded-lg border border-slate-800 text-slate-300 text-sm";
-        statusText.innerText = "Extracting raw file data stream...";
-
-        const formData = new FormData();
-        formData.append('document', selectedFile);
-
-        try {
-            // Step 1: Send file object to backend logic layer
-            const response = await fetch('/kb/admin/embed/', {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': '{{ csrf_token }}'
-                },
-                body: formData
-            });
-
-            const res = await response.json();
-
-            if (res.success) {
-                // Success Presentation State
-                statusSpinner.classList.add('hidden');
-                statusBox.className = "flex items-center gap-3 bg-emerald-950/30 border border-emerald-900/50 text-emerald-300 p-3 rounded-lg text-sm";
-                statusBox.innerHTML = `<span class="material-icons text-sm text-emerald-400">check_circle</span> Successfully vectorized and compiled ${res.chunks_count} chunks into Qdrant index.`;
-            } else {
-                throw new Error(res.error || "Ingestion cycle failure");
-            }
-
-        } catch (err) {
-            // Failure Error State
-            statusSpinner.classList.add('hidden');
-            statusBox.className = "flex items-center gap-3 bg-red-950/30 border border-red-900/50 text-red-300 p-3 rounded-lg text-sm";
-            statusBox.innerHTML = `<span class="material-icons text-sm text-red-400">error</span> Process Failed: ${err.message}`;
-        }
-    });
-</script>
+<script src="{% static 'js/upload_files.js' %}"></script>
 {% endblock %}

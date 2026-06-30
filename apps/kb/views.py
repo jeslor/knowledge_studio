@@ -50,4 +50,6 @@ async def rag_pipeline_api(request):
 
 async def embed_document_api(request):
     """API endpoint that JS calls to run the embed step-by-step"""
-    pass
+    if request.method == 'POST':
+        uploaded_files = request.FILES.getlist('documents')
+        print(uploaded_files)
