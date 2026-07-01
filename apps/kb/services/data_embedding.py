@@ -1,7 +1,8 @@
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_qdrant import QdrantVectorStore
+from langchain_qdrant import QdrantVectorStore, FastEmbedSparse
 from qdrant_client import QdrantClient
+
 # Import both ingestion entrypoints
 from .ingest_pdf import process_single_pdf, ingest_pdf_directory
 import config
@@ -59,6 +60,7 @@ class EmbeddData:
         if not docs:
             raise ValueError("Zero documents were extracted from the upload stream.")
 
+
         # 2. Text Splitting
         print("2. Chunking extracted text elements...")
         splitter = RecursiveCharacterTextSplitter(
@@ -66,10 +68,14 @@ class EmbeddData:
         )
         chunks = splitter.split_documents(docs)
 
-        # 3. Model Load
+        # 3. Model Load for embedding
         print("3. Compiling embedding vectors on native chipset...")
         embedding = HuggingFaceEmbeddings(
             model_name=self.MODEL_NAME, model_kwargs={"device": self.CHIPSET}
+        )
+
+        sparse_embedding = FastEmbedSparse(
+            model_name="Qdrant/bm25"
         )
 
         # 4. Save directly into Qdrant Cloud Cluster
@@ -78,8 +84,10 @@ class EmbeddData:
             client=self.client,
             embedding=embedding,
             collection_name=self.COLLECTION_NAME,
+            sparse_embedding=sparse_embedding,
             vector_name="safer"
         )
+
         self.db.add_documents(chunks)
         print("Success! Qdrant DB vector records synchronized.")
         return len(chunks)

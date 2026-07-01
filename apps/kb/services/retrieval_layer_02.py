@@ -1,7 +1,8 @@
 from django.core.checks import database
 from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_qdrant import QdrantVectorStore  # 📍 Swap Chroma for Qdrant bridge
+from langchain_qdrant import QdrantVectorStore, FastEmbedSparse, RetrievalMode
 from qdrant_client import QdrantClient
+from qdrant_client.models import VectorParams, Distance, SparseVectorParams
 import config as config
 
 class Retriever:
@@ -9,9 +10,11 @@ class Retriever:
         self.chipset = config.get_optimal_chipset()
         # load the model to be used to embedd the query
         print("Loading embedding model...🟢")
-        self.embedding = HuggingFaceEmbeddings(
+        self.dense_embedding = HuggingFaceEmbeddings(
             model_name=config.MODEL_NAME, model_kwargs={"device": self.chipset}
         )
+
+        self.sparse_embedding = FastEmbedSparse(model_name="Qdrant/bm25")
 
         # initialize and connect to Qdrant vector database
         print("Connecting to Qdrant Vector DB Collection...🟢")
@@ -22,13 +25,27 @@ class Retriever:
 
         if not client.collection_exists(config.COLLECTION_NAME):
             print("Creating collection...")
-
+            client.create_collection(
+                collection_name=config.COLLECTION_NAME,
+                vectors_config={
+                "safer":VectorParams(
+                    size=1024,  # MUST match your embedding dimension
+                    distance=Distance.COSINE
+                )
+            },
+            sparse_vectors_config={
+                "langchain-sparse":SparseVectorParams()
+            }
+            )
 
         self.vector_db = QdrantVectorStore(
             client=client,
             collection_name=config.COLLECTION_NAME,
-            embedding=self.embedding,
-            vector_name="safer"
+            embedding=self.dense_embedding,
+            sparse_embedding=self.sparse_embedding,
+            retrieval_mode=RetrievalMode.HYBRID,
+            vector_name="safer",
+
         )
         print("Qdrant collection successfully re-initialized with 1024 dimensions! 🚀")
 
@@ -37,14 +54,19 @@ class Retriever:
     def search_knowledge_base(self, query, num_of_candidates=10):
         print(f"🔍 Executing Qdrant vector lookup for query: '{query}'")
         found_results = self.vector_db.similarity_search(query, k=num_of_candidates)
-        print(found_results)
         return found_results
 
 
 
 
 # Single shared instance exported for your views/services layer
-retriever_service = Retriever()
+retriever_service_instance = None
+
+def retriever_service():
+    global retriever_service_instance
+    if retriever_service_instance is None:
+        retriever_service_instance = Retriever()
+    return retriever_service_instance
 
 if __name__ == "__main__":
     user_query = "ebola | intent:general"

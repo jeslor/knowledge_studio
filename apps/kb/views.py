@@ -25,15 +25,24 @@ def stream_rag_pipeline(user_query):
 
         # Step 2: Retrieve
         yield f"data: {json.dumps({'step': 'retrieve', 'msg': 'Searching knowledge base...'})}\n\n"
-        docs = retriever_service.search_knowledge_base(processed)
+        docs = retriever_service().search_knowledge_base(processed)
+        print("**"*150)
+        print(docs)
+        print("**" * 150)
 
         # Step 3: Rerank
         yield f"data: {json.dumps({'step': 'rerank', 'msg': 'Evaluating document relevance...'})}\n\n"
         ranked = rerank_service.rerank(user_query, docs)
+        print("**"*150)
+        print(ranked)
+        print("**" * 150)
 
         # Step 4: Context
         yield f"data: {json.dumps({'step': 'context', 'msg': 'Building optimized context payload...'})}\n\n"
         context, _ = build_context(ranked, 3100)
+        print("**"*150)
+        print(context)
+        print("**" * 150)
 
         # Step 5: Generate
         yield f"data: {json.dumps({'step': 'generate', 'msg': 'Synthesizing final response...'})}\n\n"
