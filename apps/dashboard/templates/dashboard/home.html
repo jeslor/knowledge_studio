@@ -9,13 +9,16 @@
                 <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 text-xs rounded-full font-semibold">Connected</span>
             </div>
 
-            <div id="chat-container" class="w-full max-w-4xl flex-1 overflow-y-auto p-6 md:p-8 custom-scroll mb-32 pb-10 flex flex-col gap-4">
-                <div id="empty-state" class="w-full flex flex-col items-center justify-center py-20 text-center gap-3 text-slate-500">
-                    <span class="material-icons text-5xl text-slate-700">explore</span>
-                    <span class="text-lg font-medium text-slate-400">Ready for instructions</span>
-                    <span class="text-sm max-w-sm">Submit a query below to monitor the retrieval processing stream.</span>
-                </div>
-            </div>
+                <section id="chat-container-wrapper" class="custom-scroll overflow-y-auto  mb-32 pb-10  w-full ">
+                    <div id="chat-container" class="w-full max-w-4xl  flex-1  p-6 md:p-8 flex flex-col gap-4 mx-auto">
+                        <div id="empty-state" class="w-full  flex flex-col items-center justify-center py-20 text-center gap-3 text-slate-500">
+                            <span class="material-icons text-5xl text-slate-700">explore</span>
+                            <span class="text-lg font-medium text-slate-400">Ready for instructions</span>
+                            <span class="text-sm max-w-sm">Submit a query below to monitor the retrieval processing stream.</span>
+                        </div>
+                    </div>
+                </section>
+
 
             <div class="absolute bottom-0 left-0 right-0 flex justify-center p-6 bg-gradient-to-t from-[#0b0f19] via-[#0b0f19]/95 to-transparent">
                 <div class="w-full max-w-4xl bg-slate-800/50 border border-slate-700/50 rounded-2xl p-2 shadow-2xl flex items-center gap-2">

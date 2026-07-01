@@ -1,8 +1,10 @@
 const queryInput = document.getElementById('query-input');
 const sendBtn = document.getElementById('send-btn');
 const chatContainer = document.getElementById('chat-container');
+const chatContainerWrapper = document.getElementById('chat-container-wrapper')
 const emptyState = document.getElementById('empty-state');
 const historyContainer = document.getElementById('history-container');
+const conversationHistory = []
 
 // Handle Send actions
 sendBtn.addEventListener('click', executePipeline);
@@ -31,7 +33,7 @@ function getCookie(name) {
 
 async function executePipeline() {
     if (queryInput && queryInput.value.trim() === '') return;
-    const query = queryInput.value.trim();
+    query = queryInput.value.trim();
     if (!query) return;
     queryInput.value = '';
 
@@ -53,7 +55,7 @@ async function executePipeline() {
 
     // 3. Insert Empty AI Status Block Card
     const aiCard = document.createElement('div');
-    aiCard.className = "w-full bg-slate-900 border border-slate-800 p-5 rounded-xl shadow-lg";
+    aiCard.className = "w-full bg-slate-900 border border-slate-800 p-5 rounded-xl shadow-lg ";
     aiCard.innerHTML = `
         <div class="flex items-center gap-2 text-emerald-400 text-xs font-semibold uppercase mb-3"><span class="material-icons text-xs">smart_toy</span>Assistant</div>
         <div id="status-box" class="flex items-center gap-3 bg-slate-850 p-3 rounded-lg border border-slate-800 w-full text-slate-300 text-sm transition-all duration-300">
@@ -62,7 +64,7 @@ async function executePipeline() {
         </div>
         <div id="ai-response-content" class="text-slate-200 leading-relaxed w-full mt-4 border-t border-slate-800 pt-4 hidden"></div>`;
     chatContainer.appendChild(aiCard);
-    chatContainer.scrollTop = chatContainer.scrollHeight;
+    chatContainerWrapper.scrollTop = chatContainer.scrollHeight;
 
     const statusBox = aiCard.querySelector('#status-box');
     const statusText = aiCard.querySelector('#status-text');
@@ -77,7 +79,7 @@ async function executePipeline() {
                 'Content-Type': 'application/json',
                 'X-CSRFToken': getCookie('csrftoken')
             },
-            body: JSON.stringify({ query: query })
+            body: JSON.stringify({ query: query, conversation:conversationHistory })
         });
 
         if (!response.ok) {
@@ -101,6 +103,12 @@ async function executePipeline() {
                 if (!line.startsWith("data: ")) continue;
 
                 const eventData = JSON.parse(line.replace("data: ", ""));
+                if(eventData.answer !== undefined){
+                    conversationHistory.push({
+                        user_message:query,
+                        bot_message:eventData.answer
+                    })
+                }
 
                 if (eventData.step === 'error') {
                     throw new Error(eventData.msg);
@@ -125,5 +133,5 @@ async function executePipeline() {
         statusBox.innerHTML = `<span class="material-icons text-sm text-red-400">error</span> Pipeline failure: ${err.message}`;
     }
 
-    chatContainer.scrollTop = chatContainer.scrollHeight;
+    chatContainerWrapper.scrollTop = chatContainer.scrollHeight;
 }

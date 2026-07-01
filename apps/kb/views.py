@@ -16,7 +16,7 @@ from .services import (
 )
 
 
-def stream_rag_pipeline(user_query):
+def stream_rag_pipeline(user_query, conversation_history):
     """Generator that runs the pipeline and yields state updates to frontend"""
     try:
         # Step 1: Process
@@ -26,32 +26,29 @@ def stream_rag_pipeline(user_query):
         # Step 2: Retrieve
         yield f"data: {json.dumps({'step': 'retrieve', 'msg': 'Searching knowledge base...'})}\n\n"
         docs = retriever_service().search_knowledge_base(processed)
-        print("**"*150)
-        print(docs)
-        print("**" * 150)
 
         # Step 3: Rerank
         yield f"data: {json.dumps({'step': 'rerank', 'msg': 'Evaluating document relevance...'})}\n\n"
         ranked = rerank_service.rerank(user_query, docs)
-        print("**"*150)
-        print(ranked)
-        print("**" * 150)
+
 
         # Step 4: Context
         yield f"data: {json.dumps({'step': 'context', 'msg': 'Building optimized context payload...'})}\n\n"
-        context, _ = build_context(ranked, 3100)
-        print("**"*150)
-        print(context)
-        print("**" * 150)
+        context, citations = build_context(ranked, 3100)
+
 
         # Step 5: Generate
         yield f"data: {json.dumps({'step': 'generate', 'msg': 'Synthesizing final response...'})}\n\n"
 
         # 📍 Direct Fix: Call it normally since it returns an AIMessage immediately!
-        result = local_model.prompt_model(user_query, context)
+        result = local_model.prompt_model(user_query, context, conversation_history)
 
         # Final Payload
-        yield f"data: {json.dumps({'step': 'complete', 'answer': result.content})}\n\n"
+        yield f"data: {json.dumps({
+            'step': 'complete',
+            'answer': result.content,
+            'sources': citations
+        })}\n\n"
 
     except Exception as e:
         yield f"data: {json.dumps({'step': 'error', 'msg': str(e)})}\n\n"
@@ -63,12 +60,13 @@ def rag_pipeline_api(request):
         try:
             data = json.loads(request.body)
             user_query = data.get('query')
+            conversation = data.get('conversation')
 
             if not user_query:
                 return JsonResponse({'success': False, 'error': 'No query provided'}, status=400)
 
             response = StreamingHttpResponse(
-                stream_rag_pipeline(user_query),
+                stream_rag_pipeline(user_query, conversation),
                 content_type="text/event-stream"
             )
             # Prevent proxy buffering so events stream instantly
