@@ -39,3 +39,6 @@ def get_optimal_chipset() -> str:
 # Default Hyperparameters
 DEFAULT_CHUNK_SIZE = 750
 DEFAULT_CHUNK_OVERLAP = 150
+
+
+COLLECTION_NAME=os.getenv("COLLECTION_NAME")

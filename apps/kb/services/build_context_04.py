@@ -3,14 +3,37 @@ import tiktoken
 encoder = tiktoken.get_encoding("cl100k_base")
 
 
-def build_context(docs, max_token: int):
+def build_context(docs, max_tokens):
     context = []
+    citations = []
     token_count = 0
-    for doc in docs:
-        text = doc.page_content if len(doc.page_content) > 0 else ""
+
+    for i, doc in enumerate(docs, start=1):
+        text = doc.page_content or ""
         tokens = len(encoder.encode(text))
-        if tokens > max_token:
+
+        if token_count + tokens > max_tokens:
             break
-        context.append(text)
+
         token_count += tokens
-    return context, token_count
+
+        source = doc.metadata.get("source", "Unknown")
+        page = doc.metadata.get("page", "?")
+
+        context.append(
+            f"""
+                [Document {i}]
+                Source: {source}
+                Page: {page}
+                
+                {text}
+            """
+        )
+
+        citations.append({
+            "id": i,
+            "source": source,
+            "page": page,
+        })
+
+    return "\n\n".join(context), citations

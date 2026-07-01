@@ -1,6 +1,6 @@
 const fileUpload = document.getElementById('file-upload');
 const fileNameLabel = document.getElementById('file-name-label');
-const fileListContainer = document.getElementById('file-list-container'); // 📍 New Reference
+const fileListContainer = document.getElementById('file-list-container');
 const embedBtn = document.getElementById('embed-btn');
 const clearBtn = document.getElementById('clear-btn');
 const statusPanel = document.getElementById('status-panel');
@@ -27,36 +27,35 @@ let selectedFiles = [];
 
 fileUpload.addEventListener('change', (e) => {
     if (e.target.files.length > 0) {
-        // Append newly selected files natively into our tracking matrix
         const incomingFiles = Array.from(e.target.files);
 
-        // Check if adding these files crosses the threshold of 10
+        // 1. Check if total items exceed limit
         if (selectedFiles.length + incomingFiles.length > 10) {
-            // Open the status panel to show the error seamlessly
             statusPanel.classList.remove('hidden');
-            statusSpinner.classList.add('hidden'); // Hide loading spinner
-
-            // Match the red failure state styling exactly
+            statusSpinner.classList.add('hidden');
             statusBox.className = "flex items-center gap-3 bg-red-950/30 border border-red-900/50 text-red-300 p-3 rounded-lg text-sm";
             statusBox.innerHTML = `
                 <span class="material-icons text-sm text-red-400">error</span>
                 Selection Ignored: Maximum upload limit reached. You can only process up to 10 files at a time.
             `;
-
-            fileUpload.value = ''; // Reset file input selection
+            fileUpload.value = '';
             return;
         }
 
+        // Add incoming files to the state tracking matrix
         selectedFiles = [...selectedFiles, ...incomingFiles];
 
+        // 📍 First change the state elements, render the view rows, and display button
         renderFileList();
         updateButtonState();
+
+        // 📍 Delay clearing the raw HTML file target data slightly so the browser transitions cleanly
+        setTimeout(() => {
+            fileUpload.value = '';
+        }, 1);
     }
-
-
 });
 
-// 📍 New Function: Loops through and builds custom UI elements for every file
 function renderFileList() {
     fileListContainer.innerHTML = '';
 
@@ -66,17 +65,13 @@ function renderFileList() {
         return;
     }
 
-    // Change dropzone headline summary statement
     fileNameLabel.innerText = `${selectedFiles.length} file(s) ready for ingestion`;
     fileNameLabel.classList.add('text-emerald-400');
 
-    //    TODO CHECK THE TOTAL FILE SIZE AND ADD A LIMIT
-
     selectedFiles.forEach((file, index) => {
         const fileRow = document.createElement('div');
-        fileRow.className = "flex items-center justify-between bg-slate-950/60 border border-slate-800/80 p-3 rounded-xl text-sm transition-all hover:border-slate-700";
+        fileRow.className = "flex items-center justify-between bg-slate-950/60 border border-slate-800/80 p-3 rounded-xl text-sm transition-all hover:border-slate-700 mb-2";
 
-        // Detect correct file icons dynamically based on extension types
         let iconName = "description";
         let iconColor = "text-slate-400";
         if (file.name.endsWith('.pdf')) {
@@ -101,7 +96,6 @@ function renderFileList() {
     });
 }
 
-// 📍 New Function: Wipes item out of list array matrix safely
 window.removeFile = function(indexToRemove) {
     selectedFiles = selectedFiles.filter((_, idx) => idx !== indexToRemove);
     renderFileList();
@@ -112,12 +106,14 @@ window.removeFile = function(indexToRemove) {
     }
 };
 
-// 📍 New Function: Keeps your layout states in sync cleanly
 function updateButtonState() {
     if (selectedFiles.length > 0) {
+        // 📍 Directly set attributes and rewrite classes to bypass any stale references
+        embedBtn.removeAttribute('disabled');
         embedBtn.disabled = false;
         embedBtn.className = "px-5 py-2 text-sm font-semibold bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl flex items-center gap-2 active:scale-95 transition-all shadow-lg shadow-emerald-950/20";
     } else {
+        embedBtn.setAttribute('disabled', 'true');
         embedBtn.disabled = true;
         embedBtn.className = "px-5 py-2 text-sm font-semibold bg-slate-800 text-slate-500 rounded-xl flex items-center gap-2 cursor-not-allowed transition-all";
     }
@@ -128,12 +124,13 @@ clearBtn.addEventListener('click', resetForm);
 function resetForm() {
     fileUpload.value = '';
     selectedFiles = [];
-    fileListContainer.innerHTML = ''; // Clear individual documents out
+    fileListContainer.innerHTML = '';
     updateButtonState();
     statusPanel.classList.add('hidden');
 }
 
-embedBtn.addEventListener('click', async () => {
+embedBtn.addEventListener('click', async (e) => {
+    e.preventDefault();
     if (selectedFiles.length === 0) return;
 
     statusPanel.classList.remove('hidden');
@@ -147,7 +144,7 @@ embedBtn.addEventListener('click', async () => {
     });
 
     try {
-        const response = await fetch('api/embed/', {
+        const response = await fetch("/api/embed/", {
             method: 'POST',
             headers: {
                 'X-CSRFToken': getCookie('csrftoken')
