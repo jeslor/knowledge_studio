@@ -209,8 +209,3 @@ First-time startup can download model artifacts and may take several minutes dep
 - `Database connection issues`:
   - Validate `SUPABASE_URI` format and SSL parameters.
 
-## Suggested Next Improvements
-
-- Add a pinned `requirements.txt` or `pyproject.toml` for reproducible installs.
-- Add an `.env.example` template with non-secret placeholders.
-- Add Docker compose services for app + Ollama + local Qdrant (optional).
