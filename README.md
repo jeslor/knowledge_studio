@@ -24,6 +24,48 @@ The current implementation uses:
   5.  LLM answer generation
 - Streaming API responses for real-time pipeline updates.
 
+## Query-to-Answer Flow
+
+The diagram below traces the complete request lifecycle from the moment a user submits a question to the moment a cited answer is streamed back to the browser.
+
+```mermaid
+flowchart LR
+    User(["👤 User"])
+
+    subgraph INPUT ["  Input  "]
+        A["Submit Query\nPOST /api/rag/"]
+    end
+
+    subgraph PREP ["  Query Preparation  "]
+        B["Query Rewriter\nOllama · qwen2.5:7b"]
+        C["Query Processor\nNormalise · Classify Intent"]
+    end
+
+    subgraph RETRIEVAL ["  Retrieval  "]
+        D["Qdrant Retriever\nHybrid Search · top-15 chunks\nDense + Sparse BM25"]
+        E["Re-ranker\nCrossEncoder · top-10 results\nBAAI/bge-reranker-large"]
+    end
+
+    subgraph GENERATION ["  Generation  "]
+        F["Context Builder\n3 100-token budget · citations"]
+        G["LLM Generation\nOllama · qwen2.5:7b"]
+    end
+
+    subgraph OUTPUT ["  Output  "]
+        H["SSE Stream\nper-stage progress events"]
+    end
+
+    Answer(["💬 Cited Answer"])
+
+    User --> A
+    A --> B --> C
+    C --> D --> E
+    E --> F --> G
+    G --> H --> Answer
+```
+
+> Each pipeline stage emits a Server-Sent Event (SSE) so the frontend can surface live progress indicators — `process → retrieve → rerank → context → generate → complete` — before the final answer arrives.
+
 ## Tech Stack
 
 - Python / Django
