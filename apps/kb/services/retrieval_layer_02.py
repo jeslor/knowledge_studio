@@ -51,7 +51,7 @@ class Retriever:
 
 
     # search the knowledge base to find details about someone
-    def search_knowledge_base(self, query, num_of_candidates=10):
+    def search_knowledge_base(self, query, num_of_candidates=15):
         print(f"🔍 Executing Qdrant vector lookup for query: '{query}'")
         found_results = self.vector_db.similarity_search(query, k=num_of_candidates)
         return found_results
