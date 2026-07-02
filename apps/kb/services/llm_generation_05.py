@@ -74,8 +74,6 @@ class LocalModel:
         prompt = ChatPromptTemplate.from_template("""
            You are a helpful assistant.
                 Use the knowledge-base to improve your answer when useful, but respond naturally.
-                
-                - make sure the results will render well in HTML with all essential tags.
 
                 Question:
                 {question}

@@ -1,4 +1,7 @@
 # Knowledge Studio
+<p align="center">
+  <img src="assets/rag_cover.jpg" alt="An entirely local, secure, and domain-agnostic Retrieval-Augmented Generation (RAG) framework." width="900">
+</p>
 
 Knowledge Studio is a Django-based Retrieval-Augmented Generation (RAG) web application for uploading knowledge documents, indexing them into Qdrant, and answering user questions with cited context.
 

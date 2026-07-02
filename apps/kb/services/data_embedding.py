@@ -1,6 +1,8 @@
+import httpx
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_qdrant import QdrantVectorStore, FastEmbedSparse
+from mpmath.calculus.extrapolation import limit
 from qdrant_client import QdrantClient
 
 # Import both ingestion entrypoints
@@ -31,6 +33,8 @@ class EmbeddData:
         self.client = QdrantClient(
             url=config.QDRANT_ENDPOINT,
             api_key=config.QDRANT_API_KEY,
+            timeout=60*20,
+            limits=httpx.Limits(max_keepalive_connections=5, max_connections=10)
         )
 
 
@@ -88,7 +92,11 @@ class EmbeddData:
             vector_name="safer"
         )
 
-        self.db.add_documents(chunks)
+        # self.db.add_documents(chunks)
+        batch_size = 100
+        for i in range(0, len(chunks), batch_size):
+            batch = chunks[i:i + batch_size]
+            self.db.add_documents(batch)
         print("Success! Qdrant DB vector records synchronized.")
         return len(chunks)
 
