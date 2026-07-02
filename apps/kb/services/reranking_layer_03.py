@@ -5,7 +5,7 @@ reranker_model = CrossEncoder("BAAI/bge-reranker-large")
 
 
 class Reranker:
-    def __init__(self, top_k: int = 3, model: CrossEncoder = reranker_model):
+    def __init__(self, top_k: int = 10, model: CrossEncoder = reranker_model):
         self.model = model
 
         self.top_k = top_k

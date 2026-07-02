@@ -18,10 +18,12 @@ from .services import (
 
 def stream_rag_pipeline(user_query, conversation_history):
     """Generator that runs the pipeline and yields state updates to frontend"""
+    user_questions = [conv['user_message'] for conv in conversation_history]
+    sanitized_question = local_model.generate_query(user_query, prev_user_queries=user_questions)
     try:
         # Step 1: Process
         yield f"data: {json.dumps({'step': 'process', 'msg': 'Analyzing and processing query...'})}\n\n"
-        processed = processor_service.process_query(user_query)
+        processed = processor_service.process_query(sanitized_question)
 
         # Step 2: Retrieve
         yield f"data: {json.dumps({'step': 'retrieve', 'msg': 'Searching knowledge base...'})}\n\n"
@@ -29,7 +31,7 @@ def stream_rag_pipeline(user_query, conversation_history):
 
         # Step 3: Rerank
         yield f"data: {json.dumps({'step': 'rerank', 'msg': 'Evaluating document relevance...'})}\n\n"
-        ranked = rerank_service.rerank(user_query, docs)
+        ranked = rerank_service.rerank(sanitized_question, docs)
 
 
         # Step 4: Context
