@@ -20,7 +20,6 @@ def stream_rag_pipeline(user_query, conversation_history):
     """Generator that runs the pipeline and yields state updates to frontend"""
     user_questions = [conv['user_message'] for conv in conversation_history]
     sanitized_question = local_model.generate_query(user_query, prev_user_queries=user_questions)
-    print(sanitized_question)
     try:
         # Step 1: Process
         yield f"data: {json.dumps({'step': 'process', 'msg': 'Analyzing and processing query...'})}\n\n"
